@@ -1,0 +1,24 @@
+#!/usr/bin/ruby
+
+require "pathname" 
+require "fileutils"
+
+UP_PATH = Pathname.new("/Applications/Tux\ Paint.app/Contents/Resources/starters/")
+
+def upload(img_path)
+	if img_path.directory?
+		img_path.each_child do |c|
+			upload(c)
+		end
+	elsif img_path.file?
+		FileUtils.copy(img_path, UP_PATH)
+	else
+		raise "Not a file or folder, dummy!"
+	end
+end
+ARGV.each do |a|
+	arg_path = Pathname.new(a)
+	upload(arg_path)
+end
+FileUtils.chmod_R(0755, UP_PATH)
+	
