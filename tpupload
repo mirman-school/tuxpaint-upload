@@ -2,18 +2,23 @@
 
 require "pathname" 
 require "fileutils"
-
-UP_PATH = Pathname.new("/Applications/Tux\ Paint.app/Contents/Resources/starters/")
-
+UP_PATH = Pathname.new(ENV["HOME"]).join("Library/Application\ Support/TuxPaint/starters/")
+TP_PATH = Pathname.new(ENV["HOME"]).join("Library/Application\ Support/TuxPaint")
+Dir.mkdir(TP_PATH) unless TP_PATH.exist?
+Dir.mkdir(UP_PATH) unless UP_PATH.exist?
+puts "Writing to #{UP_PATH}"
 def upload(img_path)
+	puts "Attempting to move #{img_path}"
 	if img_path.directory?
+		puts "Directory; moving inwards..."
 		img_path.each_child do |c|
 			upload(c)
 		end
-	elsif img_path.file?
+	elsif img_path.file? && /\.jpg|\.png|.svg/ =~ img_path.extname
+		puts "It's a file; copying over..."
 		FileUtils.copy(img_path, UP_PATH)
 	else
-		raise "Not a file or folder, dummy!"
+		puts "Not a file or folder, dummy!"
 	end
 end
 ARGV.each do |a|
